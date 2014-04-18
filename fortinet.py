@@ -3,6 +3,7 @@ import urllib2
 from bs4 import BeautifulSoup
 import re
 from time import sleep
+import gc
 
 #Fill in your username here
 username = ""
@@ -21,8 +22,15 @@ timeToCheck = 60
 intervalsBetweenRefresh = 10
 refreshLink = "" # Refresh link...this is filled in after the first login succeeds
 
+page = ""
+soup = ""
+
+
 def checkConnection():
 	#will check if the connection is okay or not
+	global page
+	global soup
+
 	page = urllib2.urlopen(checkURL)
 	soup = BeautifulSoup(page.read())
 
@@ -38,6 +46,8 @@ def submitForm():
 	#create submit params
 	#open link to submit request
 	#get the refresh link
+	global page
+	global soup
 
 	page = urllib2.urlopen(checkURL)
 	soup = BeautifulSoup(page.read())
@@ -54,24 +64,32 @@ def submitForm():
 	#get the refresh url
 	matches=re.findall(r'\"(.+?)\"',thescript)
 	#print matches[0]
+	global refreshLink
 	refreshLink = matches[0]
+
 
 def refreshPage():
 	#open the page with the refreshLink
 	#reset timer (perhaps)
 	count = 1
+	global refreshLink
+	global page
+	global soup
 	while True:
 		if checkConnection() == 0:
 			print "Not connected! Logging you in,", username
 			submitForm()
+			gc.collect()
 			count = 1
 		else:
 			if count > intervalsBetweenRefresh:
+				print "refreshLink is :", refreshLink
 				page = urllib2.urlopen(refreshLink)
 				print "Refreshed your connection! Back to Napping!"
 				count= 1
 			else:
 				count = count + 1
+			gc.collect()
 			print "You're connected! I'm sleeping!"
 			sleep(timeToCheck)
 
