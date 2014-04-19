@@ -4,6 +4,13 @@ from bs4 import BeautifulSoup
 import re
 from time import sleep
 import gc
+import ctypes
+import time
+
+def setTitle(msg):
+	ctypes.windll.kernel32.SetConsoleTitleA(msg)
+
+setTitle("Fortinet Login")
 
 #Fill in your username here
 username = ""
@@ -77,20 +84,23 @@ def refreshPage():
 	global soup
 	while True:
 		if checkConnection() == 0:
-			print "Not connected! Logging you in,", username
+			setTitle("Fortinet Login: Not connected")
+			print time.strftime("%c"), "Not connected! Logging you in,", username
 			submitForm()
 			gc.collect()
 			count = 1
 		else:
 			if count > intervalsBetweenRefresh:
-				print "refreshLink is :", refreshLink
+				setTitle("Fortinet Login: Refreshing Connection")
+				#print "refreshLink is :", refreshLink
 				page = urllib2.urlopen(refreshLink)
-				print "Refreshed your connection! Back to Napping!"
+				print time.strftime("%c"), "Refreshed your connection! Back to Napping!"
 				count= 1
 			else:
 				count = count + 1
 			gc.collect()
-			print "You're connected! I'm sleeping!"
+			setTitle("Fortinet Login: Connected")
+			print time.strftime("%c"), "You're connected! I'm sleeping!"
 			sleep(timeToCheck)
 
 #start
