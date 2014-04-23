@@ -6,6 +6,7 @@ from time import sleep
 import gc
 import ctypes
 import time
+import sys
 
 ############Settings
 #Fill in your username here
@@ -16,7 +17,9 @@ password = ""
 timeToCheck = 60
 #time in minutes, between each refresh
 intervalsBetweenRefresh = 30
-#verbosity level. Set 0 to remove all output. Only the console title will show the status.
+#verbosity level. Set 0 to remove all output.
+#Only the console title will show the status.
+#Or you can type "python fortinet.py --noverbose" from the command line, without the quotes.
 verbose = 1
 
 ##############DO NOT CHANGE ANYTHING AFTER THIS LINE
@@ -40,8 +43,13 @@ refreshLink = "" # Refresh link...this is filled in after the first login succee
 
 page = ""
 soup = ""
-
-
+try:
+	if sys.argv[1] == "--noverbose":
+		verbose = 0
+except IndexError, e:
+	pass
+	
+	
 def checkConnection():
 	#will check if the connection is okay or not
 	global page
