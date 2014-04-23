@@ -7,17 +7,27 @@ import gc
 import ctypes
 import time
 
+############Settings
+#Fill in your username here
+username = ""
+#Fill in your password here
+password = ""
+#time in seconds, between each check
+timeToCheck = 60
+#time in minutes, between each refresh
+intervalsBetweenRefresh = 30
+#verbosity level. Set 0 to remove all output. Only the console title will show the status.
+verbose = 1
+
+##############DO NOT CHANGE ANYTHING AFTER THIS LINE
+
 def setTitle(msg):
 	ctypes.windll.kernel32.SetConsoleTitleA(msg)
 
 setTitle("Fortinet Login")
 
-#Fill in your username here
-username = ""
-#Fill in your password here
-password = ""
 if(username == "" or password == ""):
-	print "No username or password, buddy! You Shall Not Pass!\n Just edit the python file at Line #8 (username) and #10 (password) and you're good to go!"
+	print "No username or password, buddy! You Shall Not Pass!\n Just edit the python file at Line #12 (username) and #14 (password) and you're good to go!"
 	print "Exiting in 5 seconds"
 	sleep(5)
 	exit()
@@ -25,8 +35,7 @@ if(username == "" or password == ""):
 fortinetURL = "https://192.168.1.99:1003/"
 checkURL = "http://en.wikipedia.org"
 checkURLOkayString = "Wikipedia, the free encyclopedia"
-timeToCheck = 60
-intervalsBetweenRefresh = 10
+
 refreshLink = "" # Refresh link...this is filled in after the first login succeeds
 
 page = ""
@@ -85,7 +94,8 @@ def refreshPage():
 	while True:
 		if checkConnection() == 0:
 			setTitle("Fortinet Login: Not connected")
-			print time.strftime("%c"), "Not connected! Logging you in,", username
+			if verbose == 1:
+				print time.strftime("%c"), "Not connected! Logging you in,", username
 			submitForm()
 			gc.collect()
 			count = 1
@@ -94,13 +104,15 @@ def refreshPage():
 				setTitle("Fortinet Login: Refreshing Connection")
 				#print "refreshLink is :", refreshLink
 				page = urllib2.urlopen(refreshLink)
-				print time.strftime("%c"), "Refreshed your connection! Back to Napping!"
+				if verbose == 1:
+					print time.strftime("%c"), "Refreshed your connection! Back to Napping!"
 				count= 1
 			else:
 				count = count + 1
 			gc.collect()
 			setTitle("Fortinet Login: Connected")
-			print time.strftime("%c"), "You're connected! I'm sleeping!"
+			if verbose == 1:
+				print time.strftime("%c"), "You're connected! I'm sleeping!"
 			sleep(timeToCheck)
 
 #start
