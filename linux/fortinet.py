@@ -18,9 +18,9 @@ class bcolors:
 
 ############Settings
 #Fill in your username here
-username = "prafiles"
+username = ""
 #Fill in your password here
-password = "pradmin"
+password = ""
 #time in seconds, between each check
 timeToCheck = 60
 #time in minutes, between each refresh
