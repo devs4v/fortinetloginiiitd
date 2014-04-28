@@ -21,64 +21,100 @@ namespace FortinetAutoLoginIIITD
             loginStatus = false;
         }
 
-        private void btn_Tray_Click(object sender, EventArgs e)
+        private void saveUISettings()
+        {
+            Properties.Settings.Default.Username = txt_Username.Text;
+            Properties.Settings.Default.Password = txt_Password.Text;
+            Properties.Settings.Default.AutoLogin = chk_DontAskAgain.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void loadUISettings()
+        {
+            chk_DontAskAgain.Checked = Properties.Settings.Default.AutoLogin;
+            txt_Username.Text = Properties.Settings.Default.Username;
+            txt_Password.Text = Properties.Settings.Default.Password;
+        }
+
+        private void minimizeToTray()
         {
             notification.Visible = true;
             notification.ShowBalloonTip(500);
             this.Hide();
         }
 
-        private void restoreWindow(object sender, EventArgs e)
+        private void restoreFromTray()
         {
             this.Show();
             notification.Visible = false;
         }
 
+        private void login()
+        {
+            lbl_Status.Text = "Performing Login";
+            performLogin(txt_Username.Text, txt_Password.Text);
+            int eval = checkConnectivity();
+            if (eval == 1)
+            {
+                btn_Login.Text = "Logout";
+                txt_Username.Enabled = false;
+                txt_Password.Enabled = false;
+                loginStatus = true;
+                lbl_Status.Text = "You've successfully logged in.";
+                progressBar.Value = 100;
+            }
+            else
+            {
+                lbl_Status.Text = "Login Failed. Check your credentials or connection.";
+            }
+        }
+
+        private void logout()
+        {
+            lbl_Status.Text = "Performing Logout";
+            performLogout();
+            btn_Login.Text = "Login";
+            txt_Username.Enabled = true;
+            txt_Password.Enabled = true;
+            loginStatus = false;
+        }
+
+        private void btn_Tray_Click(object sender, EventArgs e)
+        {
+            minimizeToTray();
+        }
+
+        private void restoreWindow(object sender, EventArgs e)
+        {
+            restoreFromTray();
+        }
+
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            chk_DontAskAgain.Checked = Properties.Settings.Default.AutoLogin;
-            txt_Username.Text = Properties.Settings.Default.Username;
-            txt_Password.Text = Properties.Settings.Default.Password;
+            loadUISettings();
             backgroundWorker();
             if (chk_DontAskAgain.Checked)
             {
-                performLogin(txt_Username.Text, txt_Password.Text);
-                btn_Login.Text = "Logout";
-                loginStatus = true;
+                login();
             }
         }
 
         private void btn_Login_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.Username = txt_Username.Text;
-            Properties.Settings.Default.Password = txt_Password.Text;
-            Properties.Settings.Default.AutoLogin = chk_DontAskAgain.Checked;
-            Properties.Settings.Default.Save();
+            saveUISettings();
             performLogin(txt_Username.Text, txt_Password.Text);
-            loginStatus = true;
-            if (chk_DontAskAgain.Checked)
+            if (!loginStatus)
             {
-                notification.Visible = true;
-                notification.ShowBalloonTip(500);
-                this.Hide();
-            }
-            if (loginStatus)
-            {
-                lbl_Status.Text = "Performing Login";
-                performLogin(txt_Username.Text, txt_Password.Text);
-                btn_Login.Text = "Logout";
+                login();
+                if (chk_DontAskAgain.Checked)
+                {
+                    minimizeToTray();
+                }
             }
             else
             {
-                lbl_Status.Text = "Performing Logout";
-                performLogout();
-                btn_Login.Text = "Login";
+                logout();
             }
-        }
-
-        private void performLogin(string username, string password)
-        {
-
         }
 
         private int checkConnectivity()
@@ -105,6 +141,11 @@ namespace FortinetAutoLoginIIITD
             }
         }
 
+        private void performLogin(string username, string password)
+        {
+
+        }
+
         private void performLogout()
         {
 
@@ -123,17 +164,19 @@ namespace FortinetAutoLoginIIITD
             switch (value)
             {
                 case 1:
-                    if (loginStatus == false)
+                    if (!loginStatus)
                     {
                         lbl_Status.Text = "Connected to direct internet!";
                         progressBar.Value = 100;
                         btn_Login.Enabled = false;
+                        timer.Interval = 1000 * 60; //1 Minute
                     }
                     else
                     {
-                        lbl_Status.Text = "Connected to direct internet!";
+                        lbl_Status.Text = "Logged in @ IIITD!";
                         progressBar.Value = 100;
                         btn_Login.Enabled = false;
+                        timer.Interval = 1000 * 60; //1 Minute
                     }
                     break;
                 case -1:
@@ -141,14 +184,38 @@ namespace FortinetAutoLoginIIITD
                     lbl_Status.Text = "Check Connecitivity to Internet";
                     progressBar.Value = 33;
                     btn_Login.Enabled = false;
+                    timer.Interval = 1000 * 10; //10 Seconds
                     break;
                 case 0:
-                    progressBar.Value = 33;
-                    btn_Login.Enabled = true;
-                    lbl_Status.Text = "Login to proceed.";
+                    if (!loginStatus)
+                    {
+                        progressBar.Value = 33;
+                        btn_Login.Enabled = true;
+                        lbl_Status.Text = "Login to proceed.";
+                        timer.Interval = 1000 * 60; //1 Minute
+                    }
+                    else
+                    {
+                        progressBar.Value = 33;
+                        btn_Login.Enabled = true;
+                        lbl_Status.Text = "Performing Automatic Login.";
+                        performLogin(txt_Username.Text, txt_Password.Text);
+                        timer.Interval = 1000 * 60 * 10; //10 Minutes
+                    }
                     break;
             }
             return value;
+        }
+
+        private void onTick(object sender, EventArgs e)
+        {
+            lbl_Status.Text = "Checking things again.";
+            backgroundWorker();
+        }
+
+        private void chk_DontAskAgain_CheckedChanged(object sender, EventArgs e)
+        {
+            saveUISettings();
         }
     }
 }

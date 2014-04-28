@@ -41,6 +41,7 @@
             this.notification = new System.Windows.Forms.NotifyIcon(this.components);
             this.txt_Password = new System.Windows.Forms.MaskedTextBox();
             this.btn_About = new System.Windows.Forms.Button();
+            this.timer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // txt_Username
@@ -98,6 +99,7 @@
             this.chk_DontAskAgain.TabIndex = 6;
             this.chk_DontAskAgain.Text = "Automatically login and hide this window.";
             this.chk_DontAskAgain.UseVisualStyleBackColor = true;
+            this.chk_DontAskAgain.CheckedChanged += new System.EventHandler(this.chk_DontAskAgain_CheckedChanged);
             // 
             // progressBar
             // 
@@ -144,12 +146,18 @@
             this.btn_About.UseVisualStyleBackColor = true;
             this.btn_About.Click += new System.EventHandler(this.btn_About_Click);
             // 
+            // timer
+            // 
+            this.timer.Enabled = true;
+            this.timer.Interval = 60000;
+            this.timer.Tick += new System.EventHandler(this.onTick);
+            // 
             // MainWindow
             // 
             this.AcceptButton = this.btn_Login;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(333, 134);
+            this.ClientSize = new System.Drawing.Size(333, 133);
             this.Controls.Add(this.btn_About);
             this.Controls.Add(this.txt_Password);
             this.Controls.Add(this.lbl_Status);
@@ -184,6 +192,7 @@
         private System.Windows.Forms.NotifyIcon notification;
         private System.Windows.Forms.MaskedTextBox txt_Password;
         private System.Windows.Forms.Button btn_About;
+        private System.Windows.Forms.Timer timer;
     }
 }
 
