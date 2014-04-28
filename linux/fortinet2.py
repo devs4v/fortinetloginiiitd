@@ -1,29 +1,3 @@
-<<<<<<< HEAD:linux/fortinet2.py
-=======
-import urllib
-import urllib2
-from BeautifulSoup import BeautifulSoup
-import re
-from time import sleep
-import gc
-import ctypes
-import time
-import sys
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-############Settings
-#Fill in your username here
-username = ""
-#Fill in your password here
-password = ""
->>>>>>> 989915d46e110c0aedf9d6b5acc439d80b5a9dd6:linux/fortinet.py
 #time in seconds, between each check
 timeToCheck = 60
 #time in minutes, between each refresh
