@@ -10,7 +10,7 @@ fi
 apt-get install python-dev python-beautifulsoup
 
 #confirm path
-installpath = /etc/init.d/fortinetautologin
+installpath = /etc/init.d/
 echo "Do you wish to change the path (Default: /etc/init.d/)?"
 select yn in "Yes" "No"; do
     case $yn in
