@@ -58,5 +58,41 @@ namespace FortinetAutoLoginIIITD.Properties {
                 this["Password"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://www.bing.com/")]
+        public string checkURL {
+            get {
+                return ((string)(this["checkURL"]));
+            }
+            set {
+                this["checkURL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://192.168.1.99:1003/")]
+        public string fortinetURL {
+            get {
+                return ((string)(this["fortinetURL"]));
+            }
+            set {
+                this["fortinetURL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool flagFastNetCheck {
+            get {
+                return ((bool)(this["flagFastNetCheck"]));
+            }
+            set {
+                this["flagFastNetCheck"] = value;
+            }
+        }
     }
 }

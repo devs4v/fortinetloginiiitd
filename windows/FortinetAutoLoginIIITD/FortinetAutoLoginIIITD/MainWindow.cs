@@ -32,14 +32,15 @@ namespace FortinetAutoLoginIIITD
         public MainWindow()
         {
             InitializeComponent();
+            using (StreamWriter writer = new StreamWriter("debug.txt", false))
+            {
+                writer.WriteLine("New Log Cleared : " + Environment.NewLine);
+            }
             flagLoginStatus = false;
-            checkURL = new Uri("http://www.bing.com/");
-            fortinetURL = new Uri("https://192.168.1.99:1003/");
-            flagFastNetCheck = false;
             connectionStatus = 10;
         }
 
-        private void saveUISettings()
+        private void saveSettings()
         {
             Properties.Settings.Default.Username = txt_Username.Text;
             Properties.Settings.Default.Password = txt_Password.Text;
@@ -47,11 +48,14 @@ namespace FortinetAutoLoginIIITD
             Properties.Settings.Default.Save();
         }
 
-        private void loadUISettings()
+        private void loadSettings()
         {
             chk_DontAskAgain.Checked = Properties.Settings.Default.AutoLogin;
             txt_Username.Text = Properties.Settings.Default.Username;
             txt_Password.Text = Properties.Settings.Default.Password;
+            checkURL = new Uri(Properties.Settings.Default.checkURL);
+            fortinetURL = new Uri(Properties.Settings.Default.fortinetURL);
+            flagFastNetCheck = Properties.Settings.Default.flagFastNetCheck;
         }
 
         private void minimizeToTray()
@@ -59,12 +63,14 @@ namespace FortinetAutoLoginIIITD
             notification.Visible = true;
             notification.ShowBalloonTip(500);
             this.Hide();
+            log("Window to tray");
         }
 
         private void restoreFromTray()
         {
             this.Show();
             notification.Visible = false;
+            log("Window Visible");
         }
 
         private void login()
@@ -112,7 +118,8 @@ namespace FortinetAutoLoginIIITD
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            loadUISettings();
+            loadSettings();
+            log("Loaded Settings.");
             if (chk_DontAskAgain.Checked)
             {
                 minimizeToTray();
@@ -122,9 +129,10 @@ namespace FortinetAutoLoginIIITD
 
         private void btn_Login_Click(object sender, EventArgs e)
         {
-            saveUISettings();
+            saveSettings();
             if (!flagLoginStatus)
             {
+                log("User attempted to log in.");
                 login();
                 if (chk_DontAskAgain.Checked)
                 {
@@ -133,32 +141,31 @@ namespace FortinetAutoLoginIIITD
             }
             else
             {
+                log("User attempted to log out.");
                 logout();
             }
         }
 
-        public bool IsConnectedToInternet //faster connectivity check (buggy results)
+        public bool IsConnectedToInternet() //faster connectivity check (buggy results)
         {
-            get
+            bool pingable = false;
+            Ping pinger = new Ping();
+            try
             {
-                Uri url = new Uri("google.com");
-                string pingurl = string.Format("{0}", url.Host);
-                string host = pingurl;
-                bool result = false;
-                Ping p = new Ping();
-                try
-                {
-                    PingReply reply = p.Send(host, 3000);
-                    if (reply.Status == IPStatus.Success)
-                        return true;
-                }
-                catch { }
-                return result;
+                PingReply reply = pinger.Send("www.google.com");
+                pingable = reply.Status == IPStatus.Success;
             }
+            catch (PingException)
+            { }
+            log("Ping returned " + pingable.ToString());
+            return pingable;
         }
 
         private int checkConnectivity() //detailed connectivity check
         {
+            if (flagFastNetCheck)
+                if (IsConnectedToInternet()) return 1;
+
             string data = openURL(checkURL.OriginalString);
             if (data == "-1")
             {
@@ -179,11 +186,12 @@ namespace FortinetAutoLoginIIITD
         }
 
         private void performLogin(string username, string password)
-        {   //code to login
+        {
             string page = openURL(checkURL.OriginalString);
             string page_4Tredir = HttpUtility.UrlEncode(checkURL.OriginalString);
             int index = page.IndexOf("magic") + 14;
             magicLogin = page.Substring(index, 16);
+            log("Magic Login : " + magicLogin);
             string postData = "4Tredir=" + page_4Tredir + "&magic=" + HttpUtility.UrlEncode(magicLogin)
                     + "&username=" + HttpUtility.UrlEncode(username) + "&password=" + HttpUtility.UrlEncode(password);
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(fortinetURL);
@@ -199,6 +207,7 @@ namespace FortinetAutoLoginIIITD
             index = page.IndexOf(keepAlive);
             keepAliveURL = new System.Uri(page.Substring(index, keepAlive.Length + 16));
             magicLogout = page.Substring(index + keepAlive.Length, 16);
+            log("Magic Logout : " + magicLogout);
             minuteCount = 0;
         }
 
@@ -231,28 +240,20 @@ namespace FortinetAutoLoginIIITD
                         lbl_Status.Text = "Connected to direct internet!";
                         progressBar.Value = 100;
                         btn_Login.Enabled = false;
-                        timer.Interval = 1000 * 60; //1 Minute
+                        timer.Interval = 1000 * 10; //10 Sec
                     }
                     else
                     {
                         lbl_Status.Text = "Logged in @ IIITD!";
                         progressBar.Value = 100;
                         btn_Login.Enabled = true;
-                        flagFastNetCheck = true;
-                        if (!IsConnectedToInternet)
-                        {
-                            flagFastNetCheck = false;
-                        }
-                        else
-                        {
-                            minuteCount++;
-                        }
-                        if (minuteCount > 30)
+                        minuteCount++;
+                        if (minuteCount > 180)
                         {
                             minuteCount = 0;
                             openURL(keepAliveURL.OriginalString);
                         }
-                        timer.Interval = 1000 * 60; //1 Minute
+                        timer.Interval = 1000 * 10; //10 Sec
                     }
                     break;
                 case -1:
@@ -260,14 +261,14 @@ namespace FortinetAutoLoginIIITD
                     lbl_Status.Text = "Check Connecitivity to Internet";
                     progressBar.Value = 33;
                     btn_Login.Enabled = false;
-                    timer.Interval = 1000 * 10; //10 Seconds
+                    timer.Interval = 1000 * 10; //10 Sec
                     break;
                 case -2:
                     flagLoginStatus = false;
                     lbl_Status.Text = "Unknown Login Detected.";
                     progressBar.Value = 33;
                     btn_Login.Enabled = false;
-                    timer.Interval = 1000 * 3600; //1 Hour
+                    timer.Interval = 1000 * 10; //10 Sec
                     break;
                 case 0:
                     if (!flagLoginStatus)
@@ -275,7 +276,7 @@ namespace FortinetAutoLoginIIITD
                         progressBar.Value = 33;
                         btn_Login.Enabled = true;
                         lbl_Status.Text = "Login to proceed.";
-                        timer.Interval = 1000 * 60; //1 Minute
+                        timer.Interval = 1000 * 10; //10 Sec
                     }
                     else
                     {
@@ -283,7 +284,7 @@ namespace FortinetAutoLoginIIITD
                         btn_Login.Enabled = true;
                         lbl_Status.Text = "Performing Automatic Login.";
                         performLogin(txt_Username.Text, txt_Password.Text);
-                        timer.Interval = 1000 * 60 * 10; //10 Minutes
+                        timer.Interval = 1000 * 10; //10 Sec
                     }
                     break;
             }
@@ -293,12 +294,12 @@ namespace FortinetAutoLoginIIITD
         private void onTick(object sender, EventArgs e)
         {
             lbl_Status.Text = "Checking things again.";
-            backgroundWorker();
+            log("Timer Tick (Background) = " + backgroundWorker().ToString());
         }
 
         private void chk_DontAskAgain_CheckedChanged(object sender, EventArgs e)
         {
-            saveUISettings();
+            saveSettings();
         }
 
         private bool IgnoreCertificateErrorHandler(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate,
@@ -309,7 +310,7 @@ namespace FortinetAutoLoginIIITD
 
         private string openURL(string urlAddress)
         {
-
+            log("Open URL " + urlAddress);
             string webPage = "";
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlAddress);
             request.AllowAutoRedirect = true;
@@ -334,6 +335,7 @@ namespace FortinetAutoLoginIIITD
             }
             catch (Exception e)
             {
+                log(e.Message);
                 return "-1";
             }
             return webPage;
@@ -341,10 +343,29 @@ namespace FortinetAutoLoginIIITD
 
         [DllImport("dnsapi.dll", EntryPoint = "DnsFlushResolverCache")]
         private static extern UInt32 DnsFlushResolverCache();
-        public static void flushDNSCache() //This can be named whatever name you want and is the function you will call
+        public static void flushDNSCache()
         {
             UInt32 result = DnsFlushResolverCache();
         }
 
+        private void btn_Log_Click(object sender, EventArgs e)
+        {
+            LogWindow logWindow = new LogWindow();
+            logWindow.Show();
+        }
+
+        private void btn_Dev_Click(object sender, EventArgs e)
+        {
+            DevOps devOps = new DevOps();
+            devOps.Show();
+        }
+
+        private void log(string text)
+        {
+            using (StreamWriter writer = new StreamWriter("debug.txt", true))
+            {
+                writer.WriteLine(text + "\n");
+            }
+        }
     }
 }
