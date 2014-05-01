@@ -215,6 +215,8 @@ namespace FortinetAutoLoginIIITD
             catch 
             {
                 lbl_Status.Text = "Unable to login.";
+                flagLoginStatus = false;
+                return;
             }
             if (page.IndexOf("<h4>The username or password you entered is incorrect.</h4>") > 0)
             {
