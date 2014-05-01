@@ -166,12 +166,12 @@ namespace FortinetAutoLoginIIITD
             if (flagFastNetCheck)
                 if (IsConnectedToInternet()) return 1;
 
-            string data = openURL(checkURL.OriginalString);
+            string data = openURL(checkURL.OriginalString);// + "search?q=" + randomString(5));
             if (data == "-1")
             {
                 return -1;
             }
-            if (data.IndexOf("<title>Bing</title>") > 0)
+            if (data.IndexOf("Bing</title>") > 0)
             {
                 return 1;
             }
@@ -187,22 +187,41 @@ namespace FortinetAutoLoginIIITD
 
         private void performLogin(string username, string password)
         {
-            string page = openURL(checkURL.OriginalString);
-            string page_4Tredir = HttpUtility.UrlEncode(checkURL.OriginalString);
+            string tempCheckURL = checkURL.OriginalString;// +"search?q=" + randomString(5);
+            string page = openURL(tempCheckURL);
+            string page_4Tredir = HttpUtility.UrlEncode(tempCheckURL);
             int index = page.IndexOf("magic") + 14;
+            if (index < 0)
+            {
+                lbl_Status.Text = "Cannot login into the firewall";
+                flagLoginStatus = false;
+            }
             magicLogin = page.Substring(index, 16);
             log("Magic Login : " + magicLogin);
             string postData = "4Tredir=" + page_4Tredir + "&magic=" + HttpUtility.UrlEncode(magicLogin)
                     + "&username=" + HttpUtility.UrlEncode(username) + "&password=" + HttpUtility.UrlEncode(password);
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(fortinetURL);
             request.Method = "POST";
-            using (StreamWriter writer = new StreamWriter(request.GetRequestStream(), Encoding.UTF8))
+            try
             {
-                writer.Write(postData);
+                using (StreamWriter writer = new StreamWriter(request.GetRequestStream(), Encoding.UTF8))
+                {
+                    writer.Write(postData);
+                }
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                StreamReader reader = new StreamReader(response.GetResponseStream());
+                page = reader.ReadToEnd();
             }
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader reader = new StreamReader(response.GetResponseStream());
-            page = reader.ReadToEnd();
+            catch 
+            {
+                lbl_Status.Text = "Unable to login.";
+            }
+            if (page.IndexOf("<h4>The username or password you entered is incorrect.</h4>") > 0)
+            {
+                lbl_Status.Text = "Incorrect Username or Password!";
+                flagLoginStatus = false;
+                return;
+            }
             string keepAlive = fortinetURL.OriginalString + "keepalive?";
             index = page.IndexOf(keepAlive);
             keepAliveURL = new System.Uri(page.Substring(index, keepAlive.Length + 16));
@@ -239,14 +258,12 @@ namespace FortinetAutoLoginIIITD
                     {
                         lbl_Status.Text = "Connected to direct internet!";
                         progressBar.Value = 100;
-                        btn_Login.Enabled = false;
                         timer.Interval = 1000 * 10; //10 Sec
                     }
                     else
                     {
                         lbl_Status.Text = "Logged in @ IIITD!";
                         progressBar.Value = 100;
-                        btn_Login.Enabled = true;
                         minuteCount++;
                         if (minuteCount > 180)
                         {
@@ -260,28 +277,24 @@ namespace FortinetAutoLoginIIITD
                     flagLoginStatus = false;
                     lbl_Status.Text = "Check Connecitivity to Internet";
                     progressBar.Value = 33;
-                    btn_Login.Enabled = false;
                     timer.Interval = 1000 * 10; //10 Sec
                     break;
                 case -2:
                     flagLoginStatus = false;
                     lbl_Status.Text = "Unknown Login Detected.";
                     progressBar.Value = 33;
-                    btn_Login.Enabled = false;
                     timer.Interval = 1000 * 10; //10 Sec
                     break;
                 case 0:
                     if (!flagLoginStatus)
                     {
                         progressBar.Value = 33;
-                        btn_Login.Enabled = true;
                         lbl_Status.Text = "Login to proceed.";
                         timer.Interval = 1000 * 10; //10 Sec
                     }
                     else
                     {
                         progressBar.Value = 33;
-                        btn_Login.Enabled = true;
                         lbl_Status.Text = "Performing Automatic Login.";
                         performLogin(txt_Username.Text, txt_Password.Text);
                         timer.Interval = 1000 * 10; //10 Sec
@@ -332,6 +345,7 @@ namespace FortinetAutoLoginIIITD
                     response.Close();
                     readStream.Close();
                 }
+                response.Close();
             }
             catch (Exception e)
             {
@@ -366,6 +380,18 @@ namespace FortinetAutoLoginIIITD
             {
                 writer.WriteLine(text + "\n");
             }
+        }
+
+        private string randomString(int size)
+        {
+            Random _rng = new Random();
+            const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            char[] buffer = new char[size];
+            for (int i = 0; i < size; i++)
+            {
+                buffer[i] = _chars[_rng.Next(_chars.Length)];
+            }
+            return new string(buffer);
         }
     }
 }
