@@ -21,7 +21,8 @@ namespace FortinetAutoLoginIIITD
             this.labelCompanyName.Text = AssemblyCompany;
             this.textBoxDescription.Text = AssemblyDescription + Environment.NewLine
                 + "Mail to prakhars@iiitd.ac.in to report errors or request features." + Environment.NewLine
-                + "Based on idea of Shivam Chaturvedi <shivam13107@iiitd.ac.in>";
+                + "Based on idea of Shivam Chaturvedi <shivam13107@iiitd.ac.in>" +Environment.NewLine
+                + "With help from Apurv Mehra <apurv09064@iiitd.ac.in> ";
         }
 
         #region Assembly Attribute Accessors
