@@ -42,19 +42,21 @@
             this.txt_Password = new System.Windows.Forms.MaskedTextBox();
             this.btn_About = new System.Windows.Forms.Button();
             this.timer = new System.Windows.Forms.Timer(this.components);
+            this.btn_Log = new System.Windows.Forms.Button();
+            this.btn_Dev = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txt_Username
             // 
-            this.txt_Username.Location = new System.Drawing.Point(78, 15);
+            this.txt_Username.Location = new System.Drawing.Point(63, 15);
             this.txt_Username.Name = "txt_Username";
             this.txt_Username.Size = new System.Drawing.Size(151, 20);
-            this.txt_Username.TabIndex = 0;
+            this.txt_Username.TabIndex = 1;
             // 
             // lbl_Username
             // 
             this.lbl_Username.AutoSize = true;
-            this.lbl_Username.Location = new System.Drawing.Point(12, 18);
+            this.lbl_Username.Location = new System.Drawing.Point(2, 18);
             this.lbl_Username.Name = "lbl_Username";
             this.lbl_Username.Size = new System.Drawing.Size(60, 13);
             this.lbl_Username.TabIndex = 2;
@@ -63,7 +65,7 @@
             // lbl_Password
             // 
             this.lbl_Password.AutoSize = true;
-            this.lbl_Password.Location = new System.Drawing.Point(12, 46);
+            this.lbl_Password.Location = new System.Drawing.Point(2, 46);
             this.lbl_Password.Name = "lbl_Password";
             this.lbl_Password.Size = new System.Drawing.Size(53, 13);
             this.lbl_Password.TabIndex = 3;
@@ -71,10 +73,10 @@
             // 
             // btn_Login
             // 
-            this.btn_Login.Location = new System.Drawing.Point(248, 13);
+            this.btn_Login.Location = new System.Drawing.Point(220, 13);
             this.btn_Login.Name = "btn_Login";
-            this.btn_Login.Size = new System.Drawing.Size(75, 23);
-            this.btn_Login.TabIndex = 4;
+            this.btn_Login.Size = new System.Drawing.Size(51, 23);
+            this.btn_Login.TabIndex = 3;
             this.btn_Login.Text = "Login";
             this.btn_Login.UseVisualStyleBackColor = true;
             this.btn_Login.Click += new System.EventHandler(this.btn_Login_Click);
@@ -82,10 +84,10 @@
             // btn_Tray
             // 
             this.btn_Tray.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btn_Tray.Location = new System.Drawing.Point(248, 41);
+            this.btn_Tray.Location = new System.Drawing.Point(220, 70);
             this.btn_Tray.Name = "btn_Tray";
-            this.btn_Tray.Size = new System.Drawing.Size(75, 23);
-            this.btn_Tray.TabIndex = 5;
+            this.btn_Tray.Size = new System.Drawing.Size(108, 23);
+            this.btn_Tray.TabIndex = 6;
             this.btn_Tray.Text = "Hide to Tray";
             this.btn_Tray.UseVisualStyleBackColor = true;
             this.btn_Tray.Click += new System.EventHandler(this.btn_Tray_Click);
@@ -93,10 +95,10 @@
             // chk_DontAskAgain
             // 
             this.chk_DontAskAgain.AutoSize = true;
-            this.chk_DontAskAgain.Location = new System.Drawing.Point(15, 74);
+            this.chk_DontAskAgain.Location = new System.Drawing.Point(1, 74);
             this.chk_DontAskAgain.Name = "chk_DontAskAgain";
             this.chk_DontAskAgain.Size = new System.Drawing.Size(218, 17);
-            this.chk_DontAskAgain.TabIndex = 6;
+            this.chk_DontAskAgain.TabIndex = 5;
             this.chk_DontAskAgain.Text = "Automatically login and hide this window.";
             this.chk_DontAskAgain.UseVisualStyleBackColor = true;
             this.chk_DontAskAgain.CheckedChanged += new System.EventHandler(this.chk_DontAskAgain_CheckedChanged);
@@ -120,7 +122,7 @@
             // notification
             // 
             this.notification.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.notification.BalloonTipText = "Auto Login is hiding. Click icon to restore.";
+            this.notification.BalloonTipText = "Auto Login is hiding. Click icon to restore. Brought to you by Prakhar Shukla";
             this.notification.BalloonTipTitle = "Auto Login @ IIITD - Fortinet";
             this.notification.Icon = ((System.Drawing.Icon)(resources.GetObject("notification.Icon")));
             this.notification.Text = "Auto Login is hiding.";
@@ -130,18 +132,18 @@
             // 
             // txt_Password
             // 
-            this.txt_Password.Location = new System.Drawing.Point(78, 43);
+            this.txt_Password.Location = new System.Drawing.Point(63, 43);
             this.txt_Password.Name = "txt_Password";
             this.txt_Password.Size = new System.Drawing.Size(151, 20);
-            this.txt_Password.TabIndex = 9;
+            this.txt_Password.TabIndex = 2;
             this.txt_Password.UseSystemPasswordChar = true;
             // 
             // btn_About
             // 
-            this.btn_About.Location = new System.Drawing.Point(248, 70);
+            this.btn_About.Location = new System.Drawing.Point(220, 41);
             this.btn_About.Name = "btn_About";
-            this.btn_About.Size = new System.Drawing.Size(75, 23);
-            this.btn_About.TabIndex = 10;
+            this.btn_About.Size = new System.Drawing.Size(51, 23);
+            this.btn_About.TabIndex = 4;
             this.btn_About.Text = "About";
             this.btn_About.UseVisualStyleBackColor = true;
             this.btn_About.Click += new System.EventHandler(this.btn_About_Click);
@@ -152,12 +154,34 @@
             this.timer.Interval = 60000;
             this.timer.Tick += new System.EventHandler(this.onTick);
             // 
+            // btn_Log
+            // 
+            this.btn_Log.Location = new System.Drawing.Point(277, 13);
+            this.btn_Log.Name = "btn_Log";
+            this.btn_Log.Size = new System.Drawing.Size(51, 23);
+            this.btn_Log.TabIndex = 9;
+            this.btn_Log.Text = "Log";
+            this.btn_Log.UseVisualStyleBackColor = true;
+            this.btn_Log.Click += new System.EventHandler(this.btn_Log_Click);
+            // 
+            // btn_Dev
+            // 
+            this.btn_Dev.Location = new System.Drawing.Point(277, 40);
+            this.btn_Dev.Name = "btn_Dev";
+            this.btn_Dev.Size = new System.Drawing.Size(51, 23);
+            this.btn_Dev.TabIndex = 10;
+            this.btn_Dev.Text = "Dev";
+            this.btn_Dev.UseVisualStyleBackColor = true;
+            this.btn_Dev.Click += new System.EventHandler(this.btn_Dev_Click);
+            // 
             // MainWindow
             // 
             this.AcceptButton = this.btn_Login;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(333, 133);
+            this.Controls.Add(this.btn_Dev);
+            this.Controls.Add(this.btn_Log);
             this.Controls.Add(this.btn_About);
             this.Controls.Add(this.txt_Password);
             this.Controls.Add(this.lbl_Status);
@@ -193,6 +217,8 @@
         private System.Windows.Forms.MaskedTextBox txt_Password;
         private System.Windows.Forms.Button btn_About;
         private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.Button btn_Log;
+        private System.Windows.Forms.Button btn_Dev;
     }
 }
 

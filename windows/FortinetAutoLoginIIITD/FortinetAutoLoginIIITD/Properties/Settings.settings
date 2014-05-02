@@ -11,5 +11,14 @@
     <Setting Name="Password" Type="System.String" Scope="User">
       <Value Profile="(Default)">pass</Value>
     </Setting>
+    <Setting Name="checkURL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://www.bing.com/</Value>
+    </Setting>
+    <Setting Name="fortinetURL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://192.168.1.99:1003/</Value>
+    </Setting>
+    <Setting Name="flagFastNetCheck" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
